@@ -1,0 +1,167 @@
+"import pandas as pd 
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from skimage import transform
+
+##
+
+dog=""natural_images/dog""
+flower=""natural_images/flower""
+person=""natural_images/person""
+motorbike=""natural_images/motorbike""
+
+##
+
+img = cv2.imread(flower+'/flower_0054.jpg')
+print(img.shape)
+
+img_BGR = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+im_gray = cv2.imread(flower+'/flower_0054.jpg', cv2.IMREAD_GRAYSCALE)
+
+##
+
+fig, (ax1, ax2) = plt.subplots(1,2, figsize= (12,14))
+ax1.axis(""off"")
+ax1.imshow(img_BGR)
+ax1.set_title(""RGB Iamge"")
+
+ax2.axis(""off"")
+ax2.imshow(im_gray,cmap=""gray"")
+ax2.set_title(""Gray scale Image"")
+
+plt.show()
+
+##
+
+im = cv2.cvtColor(im_gray, cv2.COLOR_BGR2RGB)
+
+##
+
+fig, ax = plt.subplots( figsize=(12,6))
+r = img[:, :, 0]
+g = img[:, :, 1] 
+b = img[:, :, 2]
+ax.hist(r.ravel(), bins=256, color=""red"")
+ax.hist(g.ravel(), bins=256, color=""green"")
+ax.hist(b.ravel(), bins=256, color=""blue"")
+
+plt.show()
+
+##
+
+img = cv2.imread(dog+'/dog_0049.jpg')
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+fig, ax = plt.subplots(1,2, figsize=(9,6))
+ax[0].axis(""off"")
+ax[0].imshow(img)
+
+im = img[0:90, 160:250]
+ax[1].axis(""off"")
+ax[1].imshow(im)
+plt.show()
+
+##
+
+!pip install opencv-python[all]
+
+##
+
+img = cv2.imread(person+'/person_0270.jpg')
+img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+img_gray_copy = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+#---------------salt_and_pepper_noise
+
+noise_mask =  np.random.randint(0, 21, size = (img_gray.shape[0], img_gray.shape[1]), dtype=int)
+
+zeros_pixel = np.where(noise_mask == 0)
+one_pixel = np.where(noise_mask == 20)
+
+img_gray[zeros_pixel] = 0
+img_gray[one_pixel] = 255
+
+
+#---------------remove noise
+
+img_without_noise = cv2.medianBlur(img_gray, 3)
+
+
+fig, ax = plt.subplots(1,3, figsize=(12,5))
+ax[0].axis(""off"")
+ax[0].imshow(img_gray_copy,cmap=""gray"")
+ax[0].set_title(""img_gray"")
+
+
+ax[1].axis(""off"")
+ax[1].imshow(img_gray,cmap=""gray"")
+ax[1].set_title(""salt_and_pepper_noise"")
+
+ax[2].axis(""off"")
+ax[2].imshow(img_without_noise,cmap=""gray"")
+ax[2].set_title(""img_without_noise"")
+
+plt.show()
+
+##
+
+img = cv2.imread(flower+'/flower_0353.jpg')
+img_BGR = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+##
+
+fig, (ax1, ax2,ax3) = plt.subplots(1,3, figsize= (12,6))
+
+ax1.axis(""off"")
+ax1.imshow(img)
+ax1.set_title(""BGR Image"")
+
+
+
+ax2.axis(""off"")
+ax2.imshow(img_BGR)
+ax2.set_title(""RGB Image"")
+
+ax3.axis(""off"")
+ax3.imshow(gray_image,cmap='gray')
+ax3.set_title(""GRAY Iamge"")
+
+plt.show()
+
+##
+
+img = cv2.imread(motorbike+'/motorbike_0031.jpg', cv2.IMREAD_GRAYSCALE)
+
+fig, ax = plt.subplots(1,2, figsize=(12,5))
+
+ax[0].axis(""off"")
+ax[0].imshow(img, cmap = ""gray"")
+
+mask = np.array(((0, -1, 0), (-1, 4, -1), (0, -1, 0)))
+
+convolved_image = np.zeros((img.shape[0]-2, img.shape[1]-2), dtype=""uint8"")
+
+for i in range(1, img.shape[0]-1):
+    for j in range(1, img.shape[1]-1):
+
+        sum = np.sum(np.multiply(mask, img[i-1: i+2, j-1: j+2]))
+
+        if sum < 0:
+            sum = 0
+
+        convolved_image[i-1, j-1] = sum
+ax[1].axis(""off"")
+ax[1].imshow(convolved_image, cmap = ""gray"")
+
+plt.show()
+
+##
+
+
+
+
+
+
+"

@@ -1,0 +1,177 @@
+"#!/usr/bin/env python
+# coding: utf-8
+
+# In[5]:
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+
+# In[6]:
+
+
+df = pd.read_csv('AB_NYC_2019.csv')
+df
+
+
+# Checking data-types
+
+# In[7]:
+
+
+df.dtypes
+
+
+# In[8]:
+
+
+df.info()
+
+
+# Describing Variables
+
+# In[9]:
+
+
+df.describe().T
+
+
+# Co-relation Graph
+
+# In[10]:
+
+
+plt.figure(figsize=(12,12),dpi=120)
+sns.heatmap(df.corr(),annot=True,)
+
+
+# In[11]:
+
+
+df.drop(['id', 'name', 'host_name'], axis=1, inplace=True)
+df
+
+
+# Handling Missing Values
+
+# In[12]:
+
+
+data = df.isnull().sum()
+data
+
+
+# In[13]:
+
+
+df.reviews_per_month.fillna(0, inplace=True)
+df.last_review = pd.to_datetime(df.last_review)
+
+
+# In[14]:
+
+
+df.last_review.min(), df.last_review.max()
+
+
+# In[15]:
+
+
+df.last_review.fillna(df.last_review.min(), inplace=True)
+
+
+# In[16]:
+
+
+df.isnull().sum()
+
+
+# One Hot Encoding
+
+# In[17]:
+
+
+df['expensive'] = df['price'].apply(lambda x: 'expensive' if x > 175 else 'non-expensive')
+
+
+# In[18]:
+
+
+dummies = pd.get_dummies(df['expensive'])
+hot_encoded_single_df = pd.concat([df.drop(['expensive'],axis=1),dummies], axis = 1)
+dummies.head()
+
+
+# In[19]:
+
+
+X = hot_encoded_single_df.drop(['price'], axis = 1)
+y = hot_encoded_single_df['price']
+
+
+# Splitting Data into training and testing
+
+# In[20]:
+
+
+X = df.drop(['price'], axis = 1)
+y = df['price']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+
+# Printing Dependent and Independent Variables
+
+# In[21]:
+
+
+print(X)
+
+
+# In[22]:
+
+
+print(y)
+
+
+# Scaling the data 
+# 
+# Feature scaling is important because it helps to normalize the data and put all features on the same scale. This can prevent some machine learning algorithms from being affected by the scale of the data, and can also make it easier to compare different features. Additionally, feature scaling can help to improve the performance of certain algorithms, such as k-nearest neighbors and neural networks.
+
+# In[23]:
+
+
+X_num = df[['minimum_nights', 'number_of_reviews', 'calculated_host_listings_count', 'availability_365']]
+X_cat = df.drop(['minimum_nights', 'minimum_nights', 'number_of_reviews', 'calculated_host_listings_count', 'availability_365', 'price'], axis=1)
+
+
+# In[24]:
+
+
+le = LabelEncoder()
+for i in X_cat.columns:
+  X_cat[i] = le.fit_transform(X_cat[i])
+
+
+# In[25]:
+
+
+scaler = StandardScaler()
+scaler.fit(X_num)
+X_scaled = scaler.transform(X_num)
+X_scaled = pd.DataFrame(X_scaled, index=X_num.index, columns=X_num.columns)
+X = pd.concat([X_scaled, X_cat], axis=1)
+y=df['price']
+
+
+# In[26]:
+
+
+X.head()
+
+"
